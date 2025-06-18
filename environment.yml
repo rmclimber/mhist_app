@@ -1,0 +1,19 @@
+name: mhist_pipeline
+channels:
+ - conda-forge
+ - defaults
+dependencies:
+ - python=3.11
+ - pip
+ - pytorch
+ - torchvision
+ - pandas
+ - numpy
+ - scikit-learn
+ - matplotlib
+ - pip:
+    - lightning
+    - wandb
+    - fastapi
+    - uvicorn
+    - python-dotenv

@@ -100,9 +100,9 @@ class MHIST_ETL:
             if split == "train":
                 # get mean and std for normalization
                 mean = np.mean(transformed[split]["images"], 
-                               axis=(0, 2, 3)).tolist()
+                               axis=(0, 1, 2)).tolist()
                 std = np.std(transformed[split]["images"], 
-                             axis=(0, 2, 3)).tolist()
+                             axis=(0, 1, 2)).tolist()
                 self.data_info["stats"]["mean"] = mean
                 self.data_info["stats"]["std"] = std
             
@@ -146,6 +146,11 @@ class MHIST_ETL:
 
 
 if __name__ == '__main__':
+    """
+    Usage example: assuming this is run nfrom the repo parent directory and the
+    necessary files are stored in ../../data/:
+        python src/data/mhist_etl.py -i ../../data/ -o ../../data/ -p .8 .1 .1 --seed 42
+    """
     # preliminaries
     parser = ArgumentParser(prog="MHIST ETL Pipeline",
                             description="Loads MHIST data into numpy array splits")

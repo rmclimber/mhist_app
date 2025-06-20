@@ -5,6 +5,7 @@ from collections.abc import Iterable
 from PIL import Image
 import pandas as pd
 import numpy as np
+import json
 
 class MHIST_ETL:
     BASE_FILENAME = "mhist_"
@@ -21,6 +22,8 @@ class MHIST_ETL:
         self.props = props
         self.seed = seed
         self.rng = np.random.default_rng(seed=seed)
+        self.data_info = {"stats": {},
+                          "labels": {v: k for k, v in self.DIAG_MAP.items()}}
         self._setup()
     
     def _validate_indir_structure(self):
@@ -82,17 +85,32 @@ class MHIST_ETL:
     def _transform(self, 
                    extracted: dict[str, list]) -> dict[str, dict[str, np.ndarray]]:
         """
-        Split the dataset.
+        Split the dataset, permute the tensors, and collect stats for 
+        normalization.
         """
         n = len(extracted["images"])
         indices = self._prep_indices(n)
         transformed = {key: {"images": [], "labels": []} for key in indices.keys()}
+
+        # create train-val-test splits of images and labels by index
         for split in indices:
             for idx in indices[split]:
                 transformed[split]["images"].append(extracted["images"][idx])
                 transformed[split]["labels"].append(extracted["labels"][idx])
-            transformed[split]["images"] = np.array(transformed[split]["images"])
+            if split == "train":
+                # get mean and std for normalization
+                mean = np.mean(transformed[split]["images"], 
+                               axis=(0, 2, 3)).tolist()
+                std = np.std(transformed[split]["images"], 
+                             axis=(0, 2, 3)).tolist()
+                self.data_info["stats"]["mean"] = mean
+                self.data_info["stats"]["std"] = std
+            
+            # convert list of matrices to tensors and permute images to NCHW
+            transformed[split]["images"] = np.array(
+                transformed[split]["images"]).transpose(0, 3, 1, 2)
             transformed[split]["labels"] = np.array(transformed[split]["labels"])
+            
         return transformed
 
     def _load(self, transformed: dict[str, dict[str, np.ndarray]]) -> None:
@@ -111,6 +129,10 @@ class MHIST_ETL:
             assert img_n == label_n, "Images and labels do not match!"
             np.save(label_path, transformed[split]["labels"])
             np.save(image_path, transformed[split]["images"])
+
+            # save metadata
+            with open(self.outdir / "mhist_data_info.json", "w") as f:
+                json.dump(self.data_info, f, indent=4)
             
             print(f"Saved {img_n} images to {image_path}")
             print(f"Saved {label_n} images to {label_path}")

@@ -108,7 +108,7 @@ class MHIST_ETL:
             
             # convert list of matrices to tensors and permute images to NCHW
             transformed[split]["images"] = np.array(
-                transformed[split]["images"]).transpose(0, 3, 1, 2)
+                transformed[split]["images"]).transpose(0, 3, 1, 2).astype(np.float32)
             transformed[split]["labels"] = np.array(transformed[split]["labels"])
             
         return transformed

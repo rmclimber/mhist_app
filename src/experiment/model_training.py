@@ -1,3 +1,7 @@
+# base python imports
+from yaml import safe_load
+
+# lightning imports
 from lightning.pytorch.loggers import WandbLogger
 from lightning import LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
@@ -16,23 +20,38 @@ class MHISTTraining:
     def __init__(self, run_info: dict, data_config: dict):
         self.run_info = RunInfo(**run_info)
         self.data_config = MHISTDataConfig(**data_config)
+        # collect basic information about the datasets themselves
+        self.data_info = MHISTDataInfo(
+            info_dict=safe_load(open(self.data_config.info_path, 'r')))
         self.datamodule = self._build_datamodule(run_info, self.data_config)
         self.logger = self._build_logger()
         self.model = self._build_model()
         self.trainer = self._build_trainer()
 
     def _build_datamodule(self, 
-                          data_config: MHISTDataConfig = None) -> LightningDataModule:
+                          data_config: MHISTDataConfig = None, 
+                          data_info: MHISTDataInfo = None) -> LightningDataModule:
+        """
+        All data-relevant objects are assembled here, other than the configs.
+        """
         if data_config is None:
             data_config = self.data_config
+        if data_info is None:
+            data_info = self.data_info
 
-        self.datasets = {
-            "train": self.train_dataset,
-            "val": self.val_dataset,
-            "test": self.test_dataset
-        }
+        # initialize all the datasets
+        self.datasets = {}
+        for mode in ["train", "val", "test"]:
+            self.datasets[mode] = MHISTDataset(
+                img_filename=getattr(data_config, f"{mode}_image_path"),
+                label_filename=getattr(data_config, f"{mode}_label_path"),
+                data_info=data_info,
+                mode=mode)
+        
+        # assemble the datamodule
         datamodule = MHISTDataModule(datasets=self.datasets,
-                                     data_config=data_config)
+                                     data_config=data_config,
+                                     data_info=data_info)
         return datamodule
 
     def _assemble_callbacks(self) -> list:
@@ -55,12 +74,26 @@ class MHISTTraining:
         return [model_checkpoint, early_stopping]
 
     def _build_logger(self) -> Logger:
+        """
+        Specify the logger here.
+        """
         logger = WandbLogger(project="mhist-mlops")
         logger.watch(self.model, log="all", log_freq=100)
         return logger
 
-    def _build_model(self) -> LightningModule:
-        model = LightningViT()
+    def _build_model(self, 
+                     data_info: MHISTDataInfo = None,
+                     run_info: RunInfo = None) -> LightningModule:
+        """
+        Simple wrapper for more complex model construction later.
+        """
+        if data_info is None:
+            data_info = self.data_info
+        if run_info is None:
+            run_info = self.run_info
+
+        model = LightningViT(num_classes=data_info.num_classes,
+                             lr=run_info.lr)
         return model
 
 
@@ -76,8 +109,8 @@ class MHISTTraining:
 
     def run(self):
         self.trainer.fit(self.model, self.datamodule)
-
-        # TODO: what sort of outputs are needed here?
+        # TODO: upload checkpoints to registry?
+        # TODO: what sort of outputs are needed here? prob just stats
         pass
 
 if __name__ == '__main__':

@@ -4,18 +4,24 @@ import os
 
 @dataclass
 class MHISTDataConfig:
-    train_path: str | Path
-    val_path: str | Path
-    test_path: str | Path
+    data_path: str | Path
     info_path: str | Path
     num_workers: int = 4
     batch_size: int = 32
 
     def __post_init__(self):
-        self.train_path = Path(self.train_path)
-        self.val_path = Path(self.val_path)
-        self.test_path = Path(self.test_path)
+        # ensure consistent formatting by making passed paths Path objects
+        self.data_path = Path(self.data_path)
         self.info_path = Path(self.info_path)
+
+        # generate individual paths
+        for mode in ["train", "val", "test"]:
+            label_attr_name = f"{mode}_label_path"
+            images_attr_name = f"{mode}_image_path"
+            label_suffix = f"mhist_{mode}_labels.npy"
+            image_suffix = f"mhist_{mode}_images.npy"
+            setattr(self, label_attr_name, self.data_path / label_suffix)
+            setattr(self, images_attr_name, self.data_path / image_suffix)
         self.num_workers = min(os.cpu_count(), self.num_workers)
 
 

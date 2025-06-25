@@ -9,18 +9,15 @@ from .data_info import *
 class MHISTDataModule(LightningDataModule):
     def __init__(self, 
                  datasets: dict[str, MHISTDataset],
-                 data_config: MHISTDataConfig):
+                 data_config: MHISTDataConfig,
+                 data_info: MHISTDataInfo):
         super().__init__()
         self.datasets = datasets
         self.data_config = data_config
-        self.data_info = None
+        self.data_info = data_info
         self.setup()
 
     def setup(self, stage=None):
-        # collect basic information about the datasets themselves
-        self.data_info = MHISTDataInfo(
-            info_dict=safe_load(open(self.data_config.info_path, 'r')))
-        
         # save references to the initialized datasets
         self.train_dataset = self.datasets['train']
         self.val_dataset = self.datasets['val']

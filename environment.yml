@@ -12,6 +12,7 @@ dependencies:
  - scikit-learn
  - matplotlib
  - pip:
+    - pytest
     - lightning
     - wandb
     - fastapi

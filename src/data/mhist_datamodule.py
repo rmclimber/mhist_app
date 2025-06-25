@@ -1,3 +1,4 @@
+from yaml import safe_load
 from lightning import LightningDataModule
 from torch.utils.data import DataLoader
 
@@ -12,9 +13,15 @@ class MHISTDataModule(LightningDataModule):
         super().__init__()
         self.datasets = datasets
         self.data_config = data_config
+        self.data_info = None
         self.setup()
 
     def setup(self, stage=None):
+        # collect basic information about the datasets themselves
+        self.data_info = MHISTDataInfo(
+            info_dict=safe_load(open(self.data_config.info_path, 'r')))
+        
+        # save references to the initialized datasets
         self.train_dataset = self.datasets['train']
         self.val_dataset = self.datasets['val']
         self.test_dataset = self.datasets['test']

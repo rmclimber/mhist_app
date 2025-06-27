@@ -1,11 +1,15 @@
 # base python imports
 from yaml import safe_load
+from argparse import ArgumentParser
 
 # lightning imports
 from lightning.pytorch.loggers import WandbLogger
 from lightning import LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+
+# other packages
+import wandb
 
 # my imports
 from ..model.lightning_vit import *
@@ -17,13 +21,13 @@ from .run_info import *
 
 
 class MHISTTraining:
-    def __init__(self, run_info: dict, data_config: dict):
-        self.run_info = RunInfo(**run_info)
-        self.data_config = MHISTDataConfig(**data_config)
+    def __init__(self, config: dict):
+        self.run_info = RunInfo(**config["run"])
+        self.data_config = MHISTDataConfig(**config["data"])
         # collect basic information about the datasets themselves
         self.data_info = MHISTDataInfo(
             info_dict=safe_load(open(self.data_config.info_path, 'r')))
-        self.datamodule = self._build_datamodule(run_info, self.data_config)
+        self.datamodule = self._build_datamodule(self.run_info, self.data_config)
         self.logger = self._build_logger()
         self.model = self._build_model()
         self.trainer = self._build_trainer()
@@ -77,6 +81,7 @@ class MHISTTraining:
         """
         Specify the logger here.
         """
+        wandb.login()
         logger = WandbLogger(project="mhist-mlops")
         logger.watch(self.model, log="all", log_freq=100)
         return logger
@@ -114,9 +119,14 @@ class MHISTTraining:
         pass
 
 if __name__ == '__main__':
-    # load in the configs from YML files
-    run_config = None
-    data_config = None
+    # get filename location from the command line (passed in entrypoint)
+    parser = ArgumentParser(prog="MHIST MLOps project")
+    parser.add_argument("-c", "--config", type=str, required=True)
+    args = parser.parse_args()
 
-    mhist_training = MHISTTraining(run_config, data_config)
+    # load in the config from YML file
+    config = safe_load(open(args.config, 'r'))
+
+    # do the training
+    mhist_training = MHISTTraining(config)
     mhist_training.run()

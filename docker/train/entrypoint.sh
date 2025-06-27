@@ -5,13 +5,16 @@ set -e
 BRANCH=${GIT_BRANCH:-""}  # Empty = stick with default branch
 
 # check whether GITHUB_TOKEN is set
-if [ -z "$GITHUB_TOKEN" ]; then
-    echo "GITHUB_TOKEN not set!"
+if [ -z "$GITHUB_API_KEY" ]; then
+    echo "GITHUB_API_KEY not set!"
     exit 1
 fi
 
+# Optionally pull config from GCS
+gsutil cp gs://mhist-configs/config.yaml /workspace/config.yaml
+
 # Clone the private repo (adjust the URL and branch if needed)
-git clone https://$GITHUB_TOKEN@github.com/rmclimber/mhist_app.git /workspace/mhist_app
+git clone https://$GITHUB_API_KEY@github.com/rmclimber/mhist_app.git /workspace/mhist_app
 
 # Change directory to repo
 cd /workspace/mhist_app
@@ -25,5 +28,5 @@ fi
 
 # Now run your training script
 echo "Beginning training..."
-python /workspace/mhist_app/src/experiment/model_training.py
+python /workspace/mhist_app/src/experiment/model_training.py --config /workspace/config.yaml
 echo "Training complete"

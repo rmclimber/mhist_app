@@ -1,6 +1,9 @@
 # base python imports
 from yaml import safe_load
 from argparse import ArgumentParser
+import os
+from google.cloud import storage
+
 
 # lightning imports
 from lightning.pytorch.loggers import WandbLogger
@@ -16,21 +19,40 @@ from ..model.lightning_vit import *
 from ..data.mhist_datamodule import *
 from ..data.data_info import *
 from .run_info import *
-
-
-
+from ..gcp.gcp_info import *
 
 class MHISTTraining:
     def __init__(self, config: dict):
+        # construct config objects
         self.run_info = RunInfo(**config["run"])
         self.data_config = MHISTDataConfig(**config["data"])
+        self.gcp_config = GCPInfo(**config["gcp"])
+        
+        # prepare client for storage bucket interaction
+        self.storage_client = storage.Client()
+
         # collect basic information about the datasets themselves
         self.data_info = MHISTDataInfo(
             info_dict=safe_load(open(self.data_config.info_path, 'r')))
+        
+        # assemble all pieces for the training run
         self.datamodule = self._build_datamodule(self.run_info, self.data_config)
         self.logger = self._build_logger()
         self.model = self._build_model()
         self.trainer = self._build_trainer()
+
+    def _download_data(self,
+                       client: storage.Client,
+                       data_config: MHISTDataConfig,
+                       gcp_config: GCPInfo):
+        
+        # set up for download
+        data_bucket = client.get_bucket(gcp_config.data_bucket)
+        os.makedirs(data_config.data_path, exist_ok=True)
+
+        for blob in data_bucket.list_blobs():
+            blob.download_to_filename(str(data_config.data_path / blob.name))
+            print(f"Downloaded {blob.name} to {data_config.data_path}")
 
     def _build_datamodule(self, 
                           data_config: MHISTDataConfig = None, 
@@ -42,6 +64,11 @@ class MHISTTraining:
             data_config = self.data_config
         if data_info is None:
             data_info = self.data_info
+
+        if not hasattr(self, "client"):
+            self.client = storage.Client()
+
+        self._download_data(data_config)
 
         # initialize all the datasets
         self.datasets = {}
@@ -111,11 +138,21 @@ class MHISTTraining:
                           logger=self.logger, 
                           callbacks=callbacks)
         return trainer
+    
+    def upload_checkpoints(self):
+        for checkpoint_filename in self.run_info.checkpoint_dir.glob("*.ckpt"):
+            self.s3.upload_file()
+
+    def generate_outputs(self):
+        pass
 
     def run(self):
         self.trainer.fit(self.model, self.datamodule)
         # TODO: upload checkpoints to registry?
+        self.upload_checkpoints()
+
         # TODO: what sort of outputs are needed here? prob just stats
+        self.generate_outputs()
         pass
 
 if __name__ == '__main__':

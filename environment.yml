@@ -19,3 +19,4 @@ dependencies:
     - uvicorn
     - python-dotenv
     - transformers
+    - google-cloud-storage

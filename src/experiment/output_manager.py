@@ -1,11 +1,23 @@
 import numpy as np
-import torch.nn as nn
+import sklearn as skl
+from sklearn.metrics import (
+    accuracy_score, 
+    balanced_accuracy_score,
+    confusion_matrix, 
+    f1_score, 
+    precision_score, 
+    recall_score)
+
 from lightning import LightningModule, LightningDataModule, Trainer
 
 # my code
 from .results_info import *
 
 class OutputManager:
+    metrics = {metric.__name__: metric for metric in [
+        accuracy_score, balanced_accuracy_score, confusion_matrix, 
+        f1_score, precision_score, recall_score]}
+    
     def __init__(self, 
                  model: LightningModule, 
                  trainer: Trainer,
@@ -53,4 +65,37 @@ class OutputManager:
         return results_dict
     
     def _collect_output_stats(self, results_dict: dict[str, ResultsInfo]):
-        return
+        """
+        Score all predictions from the classifier. 
+        """
+        output_dict = {}
+        for mode in ["train", "val", "test"]:
+            results_info = results_dict[mode]
+            for metric_name, metric in self.metrics.items():
+                score = metric(results_info.y, results_info.y_hat)
+                print(f"{mode} {metric_name}: {score}")
+                if isinstance(score, np.ndarray):
+                    score = score.tolist()
+                elif isinstance(score, np.float64 | np.float32):
+                    score = float(score)
+                output_dict[mode][metric_name] = score
+        return output_dict
+    
+    def generate_outputs(self, 
+                         model: LightningModule = None, 
+                         trainer: Trainer = None, 
+                         datamodule: LightningDataModule = None):
+        """
+        The only method the client should touch. 
+        """
+        if model is None:
+            model = self.model
+        if trainer is None:
+            trainer = self.trainer
+        if datamodule is None:
+            datamodule = self.datamodule
+        
+        # get all the predictions and evaluate the prediction quality
+        results_dict = self._collect_predictions(model, trainer, datamodule)
+        output_stats = self._collect_output_stats(results_dict)
+        return output_stats

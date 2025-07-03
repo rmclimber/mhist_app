@@ -1,0 +1,56 @@
+import numpy as np
+import torch.nn as nn
+from lightning import LightningModule, LightningDataModule, Trainer
+
+# my code
+from .results_info import *
+
+class OutputManager:
+    def __init__(self, 
+                 model: LightningModule, 
+                 trainer: Trainer,
+                 datamodule: LightningDataModule):
+        self.model = model
+        self.trainer = trainer
+        self.datamodule = datamodule
+    
+    def _consolidate_results_info(self, results_list: list[ResultsInfo]):
+        """
+        Trainer.predict() returns a list of batch results. In our case, that
+        will be a list of ResultsInfo objects. They need to be consolidate for
+        use gathering stats.
+        """
+        y = np.array([y for results_info in results_list for y in results_info.y])
+        y_hat = np.array([y_hat for results_info in results_list for y_hat in results_info.y_hat])
+        logits = np.array([logits for results_info in results_list for logits in results_info.logits])
+        return ResultsInfo(y=y, logits=logits, y_hat=y_hat)
+
+    def _collect_predictions(self,
+                             model: LightningModule = None,
+                             trainer: Trainer = None,
+                             datamodule: LightningDataModule = None):
+        """
+        Uses Trainer.predict() to get predictions from the model across train,
+        val, and test sets.
+        """
+        if model is None:
+            model = self.model
+        if trainer is None:
+            trainer = self.trainer
+        if datamodule is None:
+            datamodule = self.datamodule
+        
+        results_dict = {}
+
+        for mode in ["train", "val", "test"]:
+            results_list = Trainer.predict(
+                model,
+                datamodule,
+                mode=mode,
+                return_predictions=True)
+            results_dict[mode] = self._consolidate_results_info(results_list)
+        
+        return results_dict
+    
+    def _collect_output_stats(self, results_dict: dict[str, ResultsInfo]):
+        return

@@ -10,7 +10,11 @@ import json
 class MHIST_ETL:
     BASE_FILENAME = "mhist_"
     REQUIRED = ["images", "annotations.csv"]
-    DIAG_MAP = {"SSA": 1, "HP": 0}
+    DIAG_MAP = {"SSA": 1, "HP": 0} 
+    """
+    SSA is is a precancerous lesion, so we treat it as the "positive" case for
+    which we'll test recall.
+    """
 
     def __init__(self, 
                  indir: str | Path, 

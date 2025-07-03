@@ -212,6 +212,9 @@ class MHISTTraining:
         )
         self.upload_outputs(outputs)
 
+        val_loss = self.trainer.validate(self.model, self.datamodule)[0]["val_loss"]
+        return val_loss
+
 if __name__ == '__main__':
     # get filename location from the command line (passed in entrypoint)
     parser = ArgumentParser(prog="MHIST MLOps project")

@@ -3,7 +3,9 @@ from yaml import safe_load
 from argparse import ArgumentParser
 import os
 from google.cloud import storage
-
+import json
+from datetime import datetime, strftime
+from pathlib import Path
 
 # lightning imports
 from lightning.pytorch.loggers import WandbLogger
@@ -20,6 +22,7 @@ from ..data.mhist_datamodule import *
 from ..data.data_info import *
 from .run_info import *
 from ..gcp.gcp_info import *
+from .output_manager import *
 
 class MHISTTraining:
     def __init__(self, config: dict):
@@ -29,7 +32,7 @@ class MHISTTraining:
         self.gcp_config = GCPInfo(**config["gcp"])
         
         # prepare client for storage bucket interaction
-        self.storage_client = storage.Client()
+        self._bucket_setup()
 
         # collect basic information about the datasets themselves
         self.data_info = MHISTDataInfo(
@@ -41,16 +44,39 @@ class MHISTTraining:
         self.model = self._build_model()
         self.trainer = self._build_trainer()
 
+        # prepare relative filename for bucket
+        self.version = self.logger.version
+        self.output_path = Path(self.version)
+
+    
+
+    def _bucket_setup(self):
+        # prepare client
+        if not hasattr(self, "client") or self.client is None:
+            self.client = storage.Client()
+        
+        # prepare data storage bucket
+        if not hasattr(self, "data_bucket") or self.data_bucket is None:
+            self.data_bucket = self.client.get_bucket(
+                self.gcp_config.data_bucket)
+        
+        # prepare bucket for run outputs
+        if not hasattr(self, "output_bucket") or self.data_bucket is None:
+            self.output_bucket = self.client.get_bucket(
+                self.gcp_config.output_bucket)
+
     def _download_data(self,
                        client: storage.Client,
                        data_config: MHISTDataConfig,
                        gcp_config: GCPInfo):
         
+        # ensure buckets
+        self._bucket_setup()
+
         # set up for download
-        data_bucket = client.get_bucket(gcp_config.data_bucket)
         os.makedirs(data_config.data_path, exist_ok=True)
 
-        for blob in data_bucket.list_blobs():
+        for blob in self.data_bucket.list_blobs():
             blob.download_to_filename(str(data_config.data_path / blob.name))
             print(f"Downloaded {blob.name} to {data_config.data_path}")
 
@@ -65,9 +91,8 @@ class MHISTTraining:
         if data_info is None:
             data_info = self.data_info
 
-        if not hasattr(self, "client"):
-            self.client = storage.Client()
-
+        # ensure client exists; then download data
+        self._bucket_setup()
         self._download_data(data_config)
 
         # initialize all the datasets
@@ -140,20 +165,52 @@ class MHISTTraining:
         return trainer
     
     def upload_checkpoints(self):
+        self._bucket_setup()
         for checkpoint_filename in self.run_info.checkpoint_dir.glob("*.ckpt"):
-            self.s3.upload_file()
+            checkpt_blob = self.output_bucket.blob(checkpoint_filename)
+            checkpt_blob.upload_from_filename(checkpoint_filename)
 
-    def generate_outputs(self):
-        pass
+
+    def generate_outputs(self,
+                         model: LightningModule,
+                         trainer: Trainer,
+                         datamodule: LightningDataModule) -> dict:
+        """
+        Used to collect all necessary outputs.
+        """
+        manager = OutputManager(model=model,
+                                trainer=trainer,
+                                datamodule=datamodule)
+        return manager.generate_outputs()
+    
+    def upload_outputs(self, outputs: dict[str, dict]):
+        """
+        Uploads all the output stats into the GCP bucket at the specified path.
+        """
+        # prelimaries
+        self._bucket_setup()
+
+        # set up base filename
+        datetime_str = datetime.now().strftime("%Y%m%d%H%M%S")
+        output_filename = "_".join([
+            self.version, datetime_str, "{}", "stats.json"])
+        
+        # upload each output
+        for key, val in outputs.items():
+            json_str = json.dumps(val)
+            blob = self.output_bucket.blob(
+                self.output_path / output_filename.format(key))
+            blob.upload_from_string(json_str)
 
     def run(self):
         self.trainer.fit(self.model, self.datamodule)
-        # TODO: upload checkpoints to registry?
         self.upload_checkpoints()
 
-        # TODO: what sort of outputs are needed here? prob just stats
-        self.generate_outputs()
-        pass
+        # collect and save outputs as necessary
+        outputs = self.generate_outputs(
+            model=self.model, trainer=self.trainer, datamodule=self.datamodule
+        )
+        self.upload_outputs(outputs)
 
 if __name__ == '__main__':
     # get filename location from the command line (passed in entrypoint)

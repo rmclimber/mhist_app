@@ -11,7 +11,7 @@ if [ -z "$GITHUB_API_KEY" ]; then
 fi
 
 # Optionally pull config from GCS
-gsutil cp gs://mhist-configs/config.yaml /workspace/config.yaml
+gsutil cp gs://mhist-configs/config.yml /workspace/config.yml
 
 # Clone the private repo (adjust the URL and branch if needed)
 git clone https://$GITHUB_API_KEY@github.com/rmclimber/mhist_app.git /workspace/mhist_app

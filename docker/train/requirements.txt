@@ -1,0 +1,14 @@
+torch
+torchvision
+pandas
+numpy
+scikit-learn
+matplotlib
+pytest
+lightning
+wandb
+fastapi
+uvicorn
+python-dotenv
+transformers
+google-cloud-storage

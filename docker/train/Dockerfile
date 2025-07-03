@@ -6,8 +6,6 @@ FROM pytorch/pytorch:2.2.0-cuda11.8-cudnn8-runtime
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ARG GITHUB_API_KEY
-ENV GITHUB_API_KEY=$GITHUB_API_KEY
 
 # dependencies
 RUN apt-get update && apt-get install -y \

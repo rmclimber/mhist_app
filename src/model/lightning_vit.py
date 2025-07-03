@@ -3,6 +3,8 @@ from transformers import ViTConfig, ViTModel
 import torch
 import torch.nn as nn
 
+from ..experiment.results_info import *
+
 class LightningViT(LightningModule):
     def __init__(self, 
                  num_classes: int, 
@@ -37,6 +39,12 @@ class LightningViT(LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self.step(batch, "test")
+    
+    def predict_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        y_hat = torch.argmax(logits, dim=1)
+        return ResultsInfo(y=y, logits=logits, y_hat=y_hat)
     
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)

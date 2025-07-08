@@ -28,5 +28,5 @@ fi
 
 # Now run your training script
 echo "Beginning training..."
-python /workspace/mhist_app/src/experiment/model_training.py --config /workspace/config.yaml
+python /workspace/mhist_app/src/experiment/model_training.py --config /workspace/config.yml
 echo "Training complete"

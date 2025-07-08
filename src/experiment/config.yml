@@ -1,0 +1,15 @@
+run:
+  checkpoint_dir: checkpt/
+  max_epochs: 50
+  lr: 1.e-3
+
+gcp:
+  data_bucket: mhist-data
+  configs_bucket: mhist-configs
+  output_bucket: mhist-outputs
+
+data:
+  data_path: /workspace/data/
+  info_path: /workspace/data/mhist_data_info.json
+  num_workers: 4
+  batch_size: 64

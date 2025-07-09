@@ -21,6 +21,7 @@ class MHISTDataset(Dataset):
                  data_info: MHISTDataInfo,
                  mode: str = "train"):
         super().__init__()
+        self._setup_complete = False
         self.img_filename = img_filename
         self.label_filename = label_filename
         self.data_info = data_info
@@ -31,9 +32,12 @@ class MHISTDataset(Dataset):
     def _setup(self):
         self.images = np.load(self.img_filename)
         self.labels = torch.from_numpy(np.load(self.label_filename))
+        self._setup_complete = True
+
 
     def _assemble_transforms(self):
-        # NOTE: this must run after _setup()
+        if not self._setup_complete:
+            self._setup()
         if self.mode == "train":
             return Compose([
                 RandomHorizontalFlip(),
@@ -46,15 +50,19 @@ class MHISTDataset(Dataset):
                           std=self.data_info.std / 255.)
             ])
         return Compose([ToTensor(), Normalize(mean=self.data_info.mean / 255., 
-                                              std=self.data_info.std) / 255.])
+                                              std=self.data_info.std / 255.)])
     
     def __len__(self):
+        if not self._setup_complete:
+            self._setup()
         return len(self.images)
     
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
+        if not self._setup_complete:
+            self._setup()
         # necessary transpositions and casts for torchvision transforms
         x_chw = self.images[idx]
-        x_hwc = np.moveaxis(x_chw, (1, 2, 0))
+        x_hwc = np.moveaxis(x_chw, (0, 1, 2), (2, 0, 1))
         x = Image.fromarray(x_hwc.astype(np.uint8))
 
         # apply the transforms and get the transformed x back

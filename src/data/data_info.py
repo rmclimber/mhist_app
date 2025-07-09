@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 import os
+import numpy as np
 
 @dataclass
 class MHISTDataConfig:
@@ -38,5 +39,5 @@ class MHISTDataInfo:
         label_map = {int(k): v for k, v in label_map.items()}
         self.label_map = label_map
         self.num_classes = len(label_map)
-        self.mean = self.info_dict["stats"]["mean"]
-        self.std = self.info_dict["stats"]["std"]
+        self.mean = np.array(self.info_dict["stats"]["mean"])
+        self.std = np.array(self.info_dict["stats"]["std"])

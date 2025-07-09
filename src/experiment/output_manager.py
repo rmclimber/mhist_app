@@ -55,7 +55,7 @@ class OutputManager:
         results_dict = {}
 
         for mode in ["train", "val", "test"]:
-            results_list = Trainer.predict(
+            results_list = trainer.predict(
                 model,
                 datamodule,
                 mode=mode,
@@ -70,6 +70,7 @@ class OutputManager:
         """
         output_dict = {}
         for mode in ["train", "val", "test"]:
+            output_dict[mode] = {}
             results_info = results_dict[mode]
             for metric_name, metric in self.metrics.items():
                 score = metric(results_info.y, results_info.y_hat)

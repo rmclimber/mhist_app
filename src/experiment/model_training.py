@@ -61,16 +61,14 @@ class MHISTTraining:
                 self.gcp_config.data_bucket)
         
         # prepare bucket for run outputs
-        if not hasattr(self, "output_bucket") or self.data_bucket is None:
+        if not hasattr(self, "output_bucket") or self.output_bucket is None:
             self.output_bucket = self.client.get_bucket(
                 self.gcp_config.output_bucket)
 
     def _download_data(self,
-                       client: storage.Client,
-                       data_config: MHISTDataConfig,
-                       gcp_config: GCPInfo):
+                       data_config: MHISTDataConfig):
         
-        # ensure buckets
+        # ensure buckets are ready to go
         self._bucket_setup()
 
         # set up for download
@@ -124,7 +122,7 @@ class MHISTTraining:
             save_last=True)
         
         # ensure that loss is non-inf and non-NaN, and keeps improving
-        early_stopping = early_stopping = EarlyStopping(
+        early_stopping = EarlyStopping(
             monitor="train_loss", patience=100, check_finite=True
         )
         return [model_checkpoint, early_stopping]
@@ -167,7 +165,8 @@ class MHISTTraining:
     def upload_checkpoints(self):
         self._bucket_setup()
         for checkpoint_filename in self.run_info.checkpoint_dir.glob("*.ckpt"):
-            checkpt_blob = self.output_bucket.blob(checkpoint_filename)
+            checkpt_blob = self.output_bucket.blob(
+                str(self.output_path / checkpoint_filename))
             checkpt_blob.upload_from_filename(checkpoint_filename)
 
 

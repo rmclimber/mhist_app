@@ -38,3 +38,13 @@ class MHISTDataModule(LightningDataModule):
         return DataLoader(self.test_dataset, 
                           batch_size=self.data_config.batch_size,  
                           num_workers=self.data_config.num_workers)
+    
+    def predict_dataloader(self, mode: str):
+        if mode == "train":
+            return self.train_dataloader()
+        elif mode == "val":
+            return self.val_dataloader()
+        elif mode == "test":
+            return self.test_dataloader()
+        else:
+            raise ValueError(f"Invalid mode: {mode}. Choose from 'train', 'val', or 'test'.")

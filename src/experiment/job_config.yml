@@ -1,3 +1,5 @@
+scheduling:
+  strategy: SPOT
 workerPoolSpecs:
   - machineSpec:
       machineType: n1-standard-4
@@ -6,8 +8,3 @@ workerPoolSpecs:
     replicaCount: 1
     containerSpec:
       imageUri: us-west1-docker.pkg.dev/mhist-mlops/mhist-docker-repo/mhist-train:latest
-      secretEnv:
-        - name: GITHUB_API_KEY
-          value: projects/mhist-mlops/secrets/github-api-key/versions/latest
-        - name: WANDB_API_KEY
-          value: projects/mhist-mlops/secrets/wandb-api-key/versions/latest

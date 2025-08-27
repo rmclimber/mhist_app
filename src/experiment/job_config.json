@@ -14,8 +14,7 @@
       "containerSpec": {
         "imageUri": "us-west1-docker.pkg.dev/mhist-mlops/mhist-docker-repo/mhist-train:latest",
         "env": [
-          {"name": "PROJECT_ID", "value": "mhist-mlops"},
-          {"name": "GIT_BRANCH", "value": ""}
+          {"name": "PROJECT_ID", "value": "mhist-mlops"}
         ]
       }
     }
@@ -23,5 +22,5 @@
   "scheduling": {
     "strategy": "SPOT"
   },
-  "serviceAccount": ""
+  "serviceAccount": "179170236144-compute@developer.gserviceaccount.com"
 }

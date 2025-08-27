@@ -29,7 +29,7 @@ class OutputManager:
     def _consolidate_results_info(self, results_list: list[ResultsInfo]):
         """
         Trainer.predict() returns a list of batch results. In our case, that
-        will be a list of ResultsInfo objects. They need to be consolidate for
+        will be a list of ResultsInfo objects. They need to be consolidated for
         use gathering stats.
         """
         y = np.array([y for results_info in results_list for y in results_info.y])
@@ -57,7 +57,7 @@ class OutputManager:
         for mode in ["train", "val", "test"]:
             results_list = trainer.predict(
                 model,
-                datamodule)
+                dataloaders=datamodule.predict_dataloader(mode))
             results_dict[mode] = self._consolidate_results_info(results_list)
         
         return results_dict

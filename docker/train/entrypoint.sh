@@ -4,8 +4,8 @@ set -e
 # variables
 BRANCH=${GIT_BRANCH:-""}  # Empty = stick with default branch
 
-GITHUB_API_KEY=$(gcloud secrets versions access latest --secret=github-api-key)
-WANDB_API_KEY=$(gcloud secrets versions access latest --secret=wandb-api-key)
+GITHUB_API_KEY=$(gcloud secrets versions access latest --secret=github-api-key --project="$PROJECT_ID")
+WANDB_API_KEY=$(gcloud secrets versions access latest --secret=wandb-api-key --project="$PROJECT_ID")
 
 # check whether GITHUB_TOKEN is set
 if [ -z "$GITHUB_API_KEY" ]; then

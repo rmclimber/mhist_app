@@ -4,12 +4,18 @@ set -e
 # variables
 BRANCH=${GIT_BRANCH:-""}  # Empty = stick with default branch
 
-GITHUB_API_KEY=$(gcloud secrets versions access latest --secret=github-api-key --project="$PROJECT_ID")
-WANDB_API_KEY=$(gcloud secrets versions access latest --secret=wandb-api-key --project="$PROJECT_ID")
+export GITHUB_API_KEY=$(gcloud secrets versions access latest --secret=github-api-key --project="$PROJECT_ID")
+export WANDB_API_KEY=$(gcloud secrets versions access latest --secret=wandb-api-key --project="$PROJECT_ID")
 
-# check whether GITHUB_TOKEN is set
+# check whether GITHUB_API_KEY is set
 if [ -z "$GITHUB_API_KEY" ]; then
     echo "GITHUB_API_KEY not set!"
+    exit 1
+fi
+
+# check whether WANDB_API_KEY is set
+if [ -z "$WANDB_API_KEY" ]; then
+    echo "WANDB_API_KEY not set!"
     exit 1
 fi
 

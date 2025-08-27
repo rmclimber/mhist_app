@@ -1,5 +1,5 @@
 # use a Docker image with CUDA-compatible PyTorch
-FROM pytorch/pytorch:2.2.0-cuda11.8-cudnn8-runtime
+FROM pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime
 
 
 # environment variables

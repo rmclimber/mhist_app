@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import os
 from google.cloud import storage
 import json
-from datetime import datetime, strftime
+from datetime import datetime
 from pathlib import Path
 
 # lightning imports

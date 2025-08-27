@@ -35,8 +35,7 @@ class MHISTTraining:
         self._bucket_setup()
 
         # collect basic information about the datasets themselves
-        self.data_info = MHISTDataInfo(
-            info_dict=safe_load(open(self.data_config.info_path, 'r')))
+        self._data_info_setup()
         
         # assemble all pieces for the training run
         self.datamodule = self._build_datamodule(self.run_info, self.data_config)
@@ -47,8 +46,6 @@ class MHISTTraining:
         # prepare relative filename for bucket
         self.version = self.logger.version
         self.output_path = Path(self.version)
-
-    
 
     def _bucket_setup(self):
         # prepare client
@@ -64,6 +61,19 @@ class MHISTTraining:
         if not hasattr(self, "output_bucket") or self.output_bucket is None:
             self.output_bucket = self.client.get_bucket(
                 self.gcp_config.output_bucket)
+
+    def _data_info_setup(self):
+        # ensure buckets are ready to go
+        self._bucket_setup()
+
+        # set up for download
+        os.makedirs(self.data_config.info_path.parent, exist_ok=True)
+
+        blob = self.data_bucket.blob(str(self.data_config.info_path.name))
+        blob.download_to_filename(str(self.data_config.info_path))
+        
+        self.data_info = MHISTDataInfo(
+            info_dict=safe_load(open(self.data_config.info_path, 'r')))
 
     def _download_data(self,
                        data_config: MHISTDataConfig):

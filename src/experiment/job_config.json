@@ -15,7 +15,7 @@
         "imageUri": "us-west1-docker.pkg.dev/mhist-mlops/mhist-docker-repo/mhist-train:latest",
         "env": [
           {"name": "PROJECT_ID", "value": "mhist-mlops"},
-          {"name": "GIT_BRANCH", "value": "gcp"}
+          {"name": "GIT_BRANCH", "value": ""}
         ]
       }
     }

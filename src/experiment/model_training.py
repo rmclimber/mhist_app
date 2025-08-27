@@ -38,7 +38,8 @@ class MHISTTraining:
         self._data_info_setup()
         
         # assemble all pieces for the training run
-        self.datamodule = self._build_datamodule(self.run_info, self.data_config)
+        self.datamodule = self._build_datamodule(
+            data_config=self.data_config, data_info=self.data_info)
         self.logger = self._build_logger()
         self.model = self._build_model()
         self.trainer = self._build_trainer()

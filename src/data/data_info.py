@@ -7,6 +7,7 @@ import numpy as np
 class MHISTDataConfig:
     data_path: str | Path
     info_path: str | Path
+    data_name: str = "mhist"
     num_workers: int = 4
     batch_size: int = 32
 
@@ -19,8 +20,8 @@ class MHISTDataConfig:
         for mode in ["train", "val", "test"]:
             label_attr_name = f"{mode}_label_path"
             images_attr_name = f"{mode}_image_path"
-            label_suffix = f"mhist_{mode}_labels.npy"
-            image_suffix = f"mhist_{mode}_images.npy"
+            label_suffix = f"{self.data_name}_{mode}_labels.npy"
+            image_suffix = f"{self.data_name}_{mode}_images.npy"
             setattr(self, label_attr_name, self.data_path / label_suffix)
             setattr(self, images_attr_name, self.data_path / image_suffix)
         self.num_workers = min(os.cpu_count(), self.num_workers)

@@ -57,9 +57,7 @@ class OutputManager:
         for mode in ["train", "val", "test"]:
             results_list = trainer.predict(
                 model,
-                datamodule,
-                mode=mode,
-                return_predictions=True)
+                datamodule)
             results_dict[mode] = self._consolidate_results_info(results_list)
         
         return results_dict

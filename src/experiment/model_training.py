@@ -209,7 +209,7 @@ class MHISTTraining:
         for key, val in outputs.items():
             json_str = json.dumps(val)
             blob = self.output_bucket.blob(
-                self.output_path / output_filename.format(key))
+                str(self.output_path / output_filename.format(key)))
             blob.upload_from_string(json_str)
 
     def run(self):

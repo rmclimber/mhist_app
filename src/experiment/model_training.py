@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import os
 from google.cloud import storage
 import json
-from datetime import datetime
+from datetime import datetime, strftime
 from pathlib import Path
 
 # lightning imports
@@ -46,7 +46,8 @@ class MHISTTraining:
 
         # prepare relative filename for bucket
         self.version = self.logger.version
-        self.output_path = Path(self.version)
+        dt = datetime.now().strftime("%Y%m%d%H%M%S")
+        self.output_path = Path(dt + "_" + self.version)
 
     def _bucket_setup(self):
         # prepare client

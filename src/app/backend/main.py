@@ -8,9 +8,9 @@ import logging
 import uuid
 from typing import Dict, Any
 
-from inference_pipeline import InferencePipeline
-from service_info import ServiceInfo
-from prediction_router import PredictionRouter
+from .inference_pipeline import InferencePipeline
+from .service_info import ServiceInfo
+from .prediction_router import PredictionRouter
 
 
 ### PRELIMINARIES FOR THE APP

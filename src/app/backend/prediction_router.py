@@ -1,7 +1,7 @@
 import uuid
 import logging
 from fastapi import APIRouter, UploadFile
-from inference_pipeline import InferencePipeline
+from .inference_pipeline import InferencePipeline
 
 class PredictionRouter:
     def __init__(self, logger: logging.Logger, inference_pipeline: InferencePipeline):

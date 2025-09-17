@@ -28,7 +28,13 @@ class LightningViT(LightningModule):
         pixel_values, labels = batch
         logits = self(pixel_values)
         loss = self.loss_fn(logits, labels)
-        self.log(f"{mode}_loss", loss)
+        # Only log if trainer is available (e.g., during actual training)
+        try:
+            if self.trainer is not None:
+                self.log(f"{mode}_loss", loss)
+        except RuntimeError:
+            # Trainer not attached, skip logging
+            pass
         return loss
 
     def training_step(self, batch, batch_idx):

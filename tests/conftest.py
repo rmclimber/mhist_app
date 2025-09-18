@@ -31,6 +31,7 @@ def mock_http_client():
     # Create a mock client
     mock_client = MagicMock()
     mock_client.post = AsyncMock(return_value=mock_response)
+    mock_client.get = AsyncMock(return_value=mock_response)
     
     return mock_client
 

@@ -9,7 +9,7 @@ import uuid
 from typing import Dict, Any
 
 from .inference_pipeline import InferencePipeline
-from .service_info import ServiceInfo
+from ..service_info import ServiceInfo
 from .prediction_router import PredictionRouter
 
 
@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
 ### SET UP THE APP
 # create the top-level FastAPI app for uvicorn to detect and run
 app = FastAPI(
-    title="MHIST Inference Service",
+    title="MHIST Gateway Service",
     description="A FastAPI service for MHIST image classification",
     version="1.0.0",
     lifespan=lifespan

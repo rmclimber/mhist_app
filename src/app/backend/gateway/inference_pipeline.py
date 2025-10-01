@@ -9,7 +9,7 @@ from datetime import datetime
 from fastapi import FastAPI, UploadFile, HTTPException
 
 # custom imports
-from .service_info import ServiceInfo
+from ..service_info import ServiceInfo
 
 class InferencePipeline:
     def __init__(self, 

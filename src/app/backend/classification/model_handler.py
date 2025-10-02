@@ -13,7 +13,7 @@ class ModelHandler:
         model_checkpoint = blob.download_as_bytes()
 
         # Assumes model is a Lightning checkpoint and extracts the torch model
-        self.model = model_checkpoint.model  # Replace with actual model loading logic
+        self.model = model_checkpoint  # Replace with actual model loading logic
 
     async def load_labels(self):
         # Implement labels loading logic here

@@ -1,0 +1,19 @@
+# GCS buckets
+model_bucket: "mhist-models"
+data_bucket: "mhist-data"
+
+# paths on GCS buckets
+class_model_path: "class/mhist_model_v1.pkl"
+imgs_path: "mhist_test_images.npy"
+labels_path: "mhist_test_labels.npy"
+
+# service configurations
+gateway_service_host: "localhost"
+gateway_service_port: 8000
+class_service_host: "localhost"
+class_service_port: 8001
+val_service_host: "localhost"
+val_service_port: 8002
+http_timeout: 10  # seconds
+max_retries: 3
+retry_backoff: 2  # seconds

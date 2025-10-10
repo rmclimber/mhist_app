@@ -1,5 +1,6 @@
 from ..service_info import *
 from google.cloud import storage
+import numpy as np
 
 class ModelHandler:
     def __init__(self, service_info: ServiceInfo):
@@ -21,6 +22,17 @@ class ModelHandler:
         blob = bucket.blob(self.service_info.class_labels_path)
         labels_data = blob.download_as_bytes()
         self.labels = labels_data  # Replace with actual labels loading logic   
+    
+    async def load_test_data(self):
+        # Implement test data loading logic here
+        bucket = self.client.bucket(self.service_info.data_bucket)
+    
+    async def predict_random(self):
+        # Select random image
+
+        # Get prediction
+
+        # return prediction and actual label
 
     def predict(self, input_data):
         # Implement prediction logic here

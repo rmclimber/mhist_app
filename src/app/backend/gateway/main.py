@@ -8,9 +8,9 @@ import logging
 import uuid
 from typing import Dict, Any
 
-from .inference_pipeline import InferencePipeline
+from .inference_gateway import InferenceGateway
 from ..service_info import ServiceInfo
-from .prediction_router import PredictionRouter
+from .gateway_router import GatewayRouter
 
 
 ### PRELIMINARIES FOR THE APP
@@ -43,15 +43,16 @@ app.add_middleware(
 )
 
 # set up the prediction pipeline
-inference_pipeline = InferencePipeline(
+inference_gateway = InferenceGateway(
     client=http_client,
-    logger=logging.getLogger("inference_pipeline"),
+    logger=logging.getLogger("inference_gateway"),
     service_info=service_info
 )
 
 # set up router
-router = PredictionRouter(
-    logger=logging.getLogger("prediction_router"), 
-    inference_pipeline=inference_pipeline).register_routes()
+router = GatewayRouter(
+    logger=logging.getLogger("gateway_router"),
+    inference_gateway=inference_gateway
+).register_routes()
 app.include_router(router)
 

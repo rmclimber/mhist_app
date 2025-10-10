@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 # globals
 model_handler = None
 labels = None
-test_path = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,10 +29,8 @@ async def lifespan(app: FastAPI):
         # load model
         model_handler = ModelHandler(ServiceInfo())
         await model_handler.load_model()
-        labels = model_handler.load_labels()
-        test_path = Path("path/to/test/data")
+        await model_handler.load_labels()
         logger.info("Model and labels loaded successfully.")
-        test_path = setup_test()
     except Exception as e:
         logger.error(f"Failed to load model or labels: {e}")
         raise

@@ -3,19 +3,29 @@ from dataclasses import dataclass, field
 
 @dataclass
 class ServiceInfo:
-    # container specifications
-    class_service_url: str = field(init=False)
-    image_size: int = 224
-    val_service_url: str = field(init=False)
-    validate: bool = False
+    ## GCS bucket information
+    model_bucket: str = ""
+    data_bucket: str = ""
 
-    # model info
-    model_bucket: str = 'mhist-models'
-    class_model_path: str = "models/mhist_model.pth"
-    class_labels_path: str = "models/mhist_labels.json"
-    val_model_path: str = "models/mhist_val_model.pth"
-    val_labels_path: str = "models/mhist_val_labels.json"
+    # GCS paths
+    val_model_path: str = ""
+    class_model_path: str = ""
+    imgs_path: str = ""
+    labels_path: str = ""
+    data_info_path: str = ""
 
-    def __post_init__(self):
-        self.class_service_url = os.getenv("CLASS_SERVICE_URL", "http://localhost:8000/classify")
-        self.val_service_url = os.getenv("VAL_SERVICE_URL", "http://localhost:8001/validate")
+    # data miscellany
+    input_shape: int | tuple
+    
+    # service configurations
+    gateway_service_host: str = ""
+    gateway_service_port: int = 0
+    class_service_host: str = ""
+    class_service_port: int = 0
+    val_service_host: str = ""
+    val_service_port: int = 0
+
+    # general app configurations
+    http_timeout: int = 10
+    max_retries: int = 3
+    retry_delay: int = 2  # seconds

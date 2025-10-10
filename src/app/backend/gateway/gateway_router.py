@@ -24,7 +24,7 @@ class GatewayRouter:
         return {"status": "healthy"}
     
     async def root(self):
-        return {"message": "MHIST Inference Service is running."}
+        return {"message": "MHIST Gateway Service is running."}
     
     async def model_info(self):
         return {
@@ -34,11 +34,11 @@ class GatewayRouter:
         }
 
     async def predict(self, img: UploadFile):
-        return await self.inference_pipeline.predict(img)
+        return await self.inference_gateway.predict(img)
 
     async def predict_random(self):
-        return await self.inference_pipeline.predict_random()
-    
+        return await self.inference_gateway.predict_random()
+
     async def submit_feedback(self,
                               request_id: str,
                               is_correct: bool,

@@ -1,7 +1,7 @@
 import uuid
 import logging
 from fastapi import APIRouter, UploadFile
-from .inference_pipeline import InferenceGateway
+from .inference_gateway import InferenceGateway
 
 class GatewayRouter:
     def __init__(self, logger: logging.Logger, inference_gateway: InferenceGateway):

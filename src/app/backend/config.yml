@@ -3,9 +3,15 @@ model_bucket: "mhist-models"
 data_bucket: "mhist-data"
 
 # paths on GCS buckets
+val_model_path: null
 class_model_path: "class/mhist_model_v1.pkl"
 imgs_path: "mhist_test_images.npy"
 labels_path: "mhist_test_labels.npy"
+data_info_path: "mhist_data_info.json"
+
+# data info
+input_shape: [3, 224, 224]
+
 
 # service configurations
 gateway_service_host: "localhost"

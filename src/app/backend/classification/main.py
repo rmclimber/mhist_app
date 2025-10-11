@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
         # load model
         model_handler = ModelHandler(ServiceInfo())
         await model_handler.load_model()
-        await model_handler.load_labels()
+        await model_handler.load_test_data()
         logger.info("Model and labels loaded successfully.")
     except Exception as e:
         logger.error(f"Failed to load model or labels: {e}")

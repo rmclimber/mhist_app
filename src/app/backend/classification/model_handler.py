@@ -13,8 +13,8 @@ class ModelHandler:
         blob = bucket.blob(self.service_info.class_model_path)
         model_checkpoint = blob.download_as_bytes()
 
-        # Assumes model is a Lightning checkpoint and extracts the torch model
-        self.model = model_checkpoint  # Replace with actual model loading logic
+        # Assumes model is a Lightning checkpoint
+        self.model = model_checkpoint  
 
     async def load_test_data(self):
         # Implement test data loading logic here

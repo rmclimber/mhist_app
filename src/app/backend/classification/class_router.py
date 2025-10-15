@@ -19,7 +19,6 @@ class ClassRouter:
         self.router.get("/model-info")(self.model_info)
         self.router.post("/predict")(self.predict)
         self.router.get("/predict-random")(self.predict_random)
-        self.router.get("/feedback")(self.submit_feedback)
     
     async def health_check(self):
         return {"status": "healthy"}

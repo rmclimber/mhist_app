@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import './globals.css';
+import './globals.css';  // ← CRITICAL LINE
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'ML Image Classifier',
-  description: 'Machine learning image classification demo with FastAPI and Next.js',
+  description: 'Machine learning image classification demo',
 };
 
 export default function RootLayout({

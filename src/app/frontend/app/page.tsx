@@ -75,19 +75,48 @@ export default function Homepage() {
               <a href={process.env.NEXT_PUBLIC_GITHUB_URL || '#'} 
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors">
-                  <Github className="w-5 h-5">View on Github</Github>
+                  Code Repository (GitHub)
                 </a>
                 <span className="hidden sm:block text-gray-300">|</span>
                 <a href={process.env.NEXT_PUBLIC_WANDB_URL || '#'} 
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors">
-                    <BarChart3 className="w-5 h-5">Weights & Biases Experiment</BarChart3>
+                    Weights & Biases Experiment
                 </a>
+                <span className="hidden sm:block text-gray-300">|</span>
+                <a href="https://bmirds.github.io/MHIST/" 
+                  target="_blank" rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors">
+                    MHIST Dataset
+                </a>
+              </div>
+              <div className="mt-4 text-sm text-gray-500">
+                <p>
+                  <a  
+                  target="_blank" rel="noopener noreferrer"
+                  href="https://arxiv.org/abs/2101.12355">Wei et al 2021: "A Petri Dish for Histopathology Image Analysis" (original MHIST paper)</a>
+                </p>
             </div>
           </div>
+          {/*Footer */}
+          <footer className="border-t bg-white/50 backdrop-blur-sm mt-16">
+            <div className="container mx-auto px-4 py-6 text-center text-gray-600 text-sm">
+              Built for Google Cloud Platform with Next.js, FastAPI, and Tailwind CSS.
+            </div>
+          </footer>
         </div>
       </main>
 
     </div>
   );
 }   
+
+function FeatureCard({ title, description, icon}: {title: string; description: string; icon: string}) {
+  return (
+    <div className="p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+      <div className="text-4xl mb-3">{icon}</div>
+      <h4 className="text-lg font-semibold text-gray-900 mb-2">{title}</h4>
+      <p className="text-gray-600 text-sm">{description}</p>
+    </div>
+  );
+}

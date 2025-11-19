@@ -24,9 +24,11 @@ export default function RootLayout({
           <header className="border-b bg-white/50 backdrop-blur-sm">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-gray-900">MHIST Classifier</h1>
+                <a href="/" className="text-gray-900 hover:text-gray-700 transition-colors">
+                  <h1 className="text-xl font-bold text-gray-900">MHIST Classifier</h1>
+                </a>
               </div>
-            
+
             <div>
               <p>Rick Morris</p>
             </div>

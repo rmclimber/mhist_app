@@ -9,7 +9,7 @@ export default function Homepage() {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Title */}
           <div className="space-y-4">
-            <h2 className="text-5xl font-bold text-gray-900 tracking-tight">
+            <h2 className="text-4xl font-bold text-gray-900 tracking-tight">
               MHIST Image Classification <span className="block text-blue-600 mt-2">Demo</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
